@@ -1,0 +1,138 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+# 85 - A8FF00
+# 60 - FFF600
+# 40 - FFAE00
+# 20 - FF1A00
+# 10 - FF0000
+
+import os
+import sys
+import re
+import subprocess as sp
+
+# TODO: add command execution to display error message:
+#		i3-nagbar -t warning -m 'Battery is low! Please, put on power supply'
+
+
+class Battery:
+	ALARM_LOCK='/tmp/.battery-alarm.10pc.once'
+	ALARM_LOCK_PANIC='/tmp/.battery-alarm.5pc.once'
+	def __init__(self):
+		self._percent = None
+		self._status  = None
+		self._remaining = None
+		self._percent = 0 
+		self._color   = ''
+		self._notify  = False
+		self._errno   = 0
+		self._label   = None
+
+	def __acpiPercent(self):
+		bat_number = os.environ.get('BLOCK_INSTANCE')
+		bat_number = int(bat_number) if bat_number else 0
+
+		ctx = sp.check_output(["acpi", "-b"])
+		ctx = ctx.decode("utf-8").split('\n')
+		for s in ctx:
+			m = re.match(r'^Battery ([0-9]+): (\w+), (\d+)%(, (\d+:\d+):)?', s)
+			if m:
+				if int(m.group(1)) != bat_number:
+					continue
+				self._percent = int(m.group(3))
+				self._status  = m.group(2)
+				self._remaining = m.group(5)
+
+	def __alarmOnce(self, lockfile=None):
+		if lockfile is None:
+			lockfile = Battery.ALARM_LOCK
+		if os.path.exists(lockfile):
+			return
+		with open(lockfile, "w") as f:
+			pass
+		pid = os.fork()
+		if pid == 0:
+			typ, msg = 'warning', 'Battery is low. Power supply is required.'
+			if self._percent <= 5.0:
+				typ, msg = 'error', 'BATTERY IS TOO LOW. POWER SUPPLY IS REQUIRED IMMEDIATELY'
+			out = sp.check_output(['i3-nagbar', '-t', typ, '-m', msg]);
+			exit(0);
+		else:
+			return
+		
+	def __alarmClear(self, lockfile=None):
+		if lockfile is None:
+			lockfile = Battery.ALARM_LOCK
+		if os.path.exists(lockfile):
+			os.unlink(lockfile)
+			os.check_output(['killall', 'i3-nagbar'])
+
+	def __hashcolor(self, percent):
+		RGB = [0x7F, 0xFF, 0x00];
+		RGB[0] = min(0xFF, 0x7F + int(RGB[0] / 100 * (100-percent)*1.1))
+		RGB[1] = min(0xFF, max(0x00, RGB[1] - int((0xFF/100 * (100 - percent))*1.1)))
+		if RGB[0]<0xEF and RGB[1]<0xEF:
+			dt = min(0xEF-RGB[0], 0xEF-RGB[1])
+			RGB[0]+=dt
+			RGB[1]+=dt
+	
+		return "#%.2X%.2X%.2X" % ( RGB[0], RGB[1], RGB[2] )
+
+	def process(self):
+		self.__acpiPercent()
+		if (self._percent is not None):
+			self._color = self.__hashcolor(self._percent)
+			percents = { 20:'', 40:'', 60:'', 80:'' }
+			for remain in sorted(percents.keys()):
+				if self._percent<remain:
+					self._label = percents[remain]
+					break
+			else:
+				self._label = ''
+			if self._status == 'Charging':
+				self._status = ''
+				self.__alarmClear()
+				self.__alarmClear(Battery.ALARM_LOCK_PANIC)
+			else:
+				if self._percent <= 5.0:
+					self.__alarmClear()
+					self.__alarmOnce(Battery.ALARM_LOCK_PANIC)
+				elif self._percent < 10.0:
+					self.__alarmOnce()
+				self._status = ''
+		else:
+			self._label = 'B'
+			self._percent = '?%'
+			self._status = '?'
+			self._color = '#FFFF00'
+			self._remaining = ''
+
+
+		return self
+
+	def printout(self):
+		short = "{0} {1}% {2}".format(self._label, self._percent, self._status)
+		if self._remaining:
+			full = "{0} {1}".format(short, self._remaining)
+		sys.stdout.write("%s\n"%full)
+		sys.stdout.write("%s\n"%short)
+		sys.stdout.write("%s\n"%self._color)
+		exit(self._errno)
+
+	def html(self):
+		with open("/tmp/batcolors.html", "w") as f:
+			f.write("<html><body>\n");
+			for i in range(100, 0, -1):
+				color = self.__hashcolor(i);
+				f.write("<div style=\"width: 200px; height: 14px; background-color: %s\">" % color +
+					"<i style=\"font-size: 10px\">%.3d%% %s</i></div>\n" % (i, color));
+			f.write("</body></html>\n");
+
+
+if __name__ == '__main__':
+	if '--html' in sys.argv:
+		Battery().process().html()
+		exit(0)
+	Battery().process().printout()
+

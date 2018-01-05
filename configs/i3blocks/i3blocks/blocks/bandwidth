@@ -1,0 +1,107 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+import os
+import sys
+import time
+import subprocess as sp
+
+class Bandwidth:
+	def __init__(self):
+		self._interface = None
+		self._rx = None
+		self._tx = None
+		self._time = int(time.time())
+		self._isUp = None
+		self._errno = 0
+
+	def __getInterface(self):
+		if self._interface is None:
+			iface = os.environ.get('BLOCK_INSTANCE')
+			if not iface:
+				out = sp.check_output(['ip', 'route'])
+				out = out.decode('utf-8').split('\n')
+				iflist = [s.split(' ')[4] for s in out if s.startswith('default ')]
+				if len(iflist)==0:
+					self._errno = 33
+					exit(33)
+				else:
+					iface = iflist[0]
+			self._interface = iface
+		return self._interface
+
+	def __getPathSysClass(self):
+		return "/sys/class/net/{0}".format(self.__getInterface())
+	def __getPathShm(self):
+		return "/dev/shm/bandwidth-{0}".format(self.__getInterface())
+			
+	def __getRxTx(self):
+		with open(self.__getPathSysClass()+"/statistics/rx_bytes", "r") as f:
+			self._rx = int(f.readline().strip())
+		with open(self.__getPathSysClass()+"/statistics/tx_bytes", "r") as f:
+			self._tx = int(f.readline().strip())
+		
+		otm, orx, otx = self.__getOldRxTx()
+		dt = (self._time - otm)
+		rx = self._rx - orx
+		tx = self._tx - otx
+		return (0, 0) if dt == 0 else (int(rx/dt), int(tx/dt))
+
+	def __getOldRxTx(self):
+		if not os.path.exists(self.__getPathShm()):
+			self.__savRxTx()
+			return (self._time, self._rx, self._tx)
+		with open(self.__getPathShm(), "r") as f:
+			return map(int, f.readline().strip().split(' '))
+		
+
+	def __savRxTx(self):
+		with open(self.__getPathShm(), "w") as f:
+			f.write("%d %d %d\n" % (self._time, self._rx, self._tx))
+
+	def isAvailable(self):
+		if self._isUp is None:
+			def _state():
+				if not os.path.exists(self.__getPathSysClass()+"/operstate"):
+					print(self.__getPathSysClass()+"/operstate")
+					return False
+				with open(self.__getPathSysClass()+"/operstate", "r") as f:
+					if f.readline().strip() == 'up':
+						return True
+				return False
+			self._isUp = _state()
+		return self._isUp
+
+	def process(self):
+		if not self.isAvailable():
+			return self
+		rx, tx = self.__getRxTx()
+		self.__savRxTx()
+		self._rx = rx
+		self._tx = tx
+		return self
+
+	def printout(self):
+		if not self.isAvailable():
+			sys.stdout.write("\n") # full_text
+			sys.stdout.write("\n") # short_text
+			sys.stdout.write("#FF0000\n") # 
+			return
+		def _format(label, transf):
+			multi = ['b', 'K', 'M', 'G']
+			k = 0
+			while (k+1) < len(multi) and transf > pow( 2, 10*(k+1)):
+				k+=1
+			#return "{0} {1}{2}".format(label, int(transf/pow( 2, 10*k)), multi[k])
+			x = "%d" % int(transf/pow( 2, 10*k))
+			return u"%s %s%s%s" % (label, (u"\u00B7" * 4)[len(x):], x, multi[k])
+			
+		out = [_format(*s) for s in zip( ("", ""), (self._rx,    self._tx))]
+		sys.stdout.write(" ".join(out)+"\n")
+		sys.stdout.write(" ".join(out)+"\n")
+		sys.stdout.write("#FFFFFF\n")
+		
+
+if __name__ == '__main__':
+	Bandwidth().process().printout()	
+

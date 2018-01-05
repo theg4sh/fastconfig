@@ -1,0 +1,99 @@
+#!/usr/bin/python3
+
+import os
+import sys
+import re
+import subprocess as sp
+
+class AMixer(object):
+	def __init__(self):
+		self._step  = "5%"
+		self._mixer = self._defaultMixer()
+
+		self._scontrol     = os.environ.get('BLOCK_INSTANCE', self.__scontrol())
+		self._volume	   = None
+		self._capability   = self.__capability()
+		self._block_button = os.environ.get('BLOCK_BUTTON')
+		
+	def __amixer_q(self, *args, quiet=False):
+		amixer_cmd = ["amixer", "-D", self._mixer]
+		if quiet:
+			amixer_cmd.append("-q")
+		for arg in args:
+			amixer_cmd.append(arg)
+		if quiet:
+			sp.check_output(amixer_cmd)
+		else:
+			output = sp.check_output(amixer_cmd)
+			return output.decode('utf-8').split('\n')
+
+	def __scontrol(self):
+		#scontrols = sp.check_output(["amixer", "-D", self._mixer, "scontrols"])
+		scontrols = [s[21:].split(',') for s in self.__amixer_q("scontrols") if s.startswith('Simple mixer control ')]
+		return scontrols[0][0].strip("'")
+
+	def __capability(self):
+		capa = [s for s in self.__amixer_q("get", self._scontrol) if s.find('Capabilities:')>0 and s.find('cvolume')>0]
+		if len(capa):
+			return "capture"
+		return ""
+
+	def __volume(self):
+		return self.__amixer_q("get", self._scontrol, self._capability)
+
+	def _defaultMixer(self):
+		mixer="default"
+		lsmod = sp.check_output(["lsmod"])
+		lsmod = [('pulse' if s.find('pulse')>0 else 'jackplug') 
+			for s in lsmod.decode('utf-8').split('\n') if s.find('pulse')>=0 or s.find('jack')>=0]
+		if len(lsmod)>0:
+			mixer = lsmod[0]
+		return mixer
+
+	def _actNone(self):
+		pass
+	def _actVolToggle(self):
+		self.__amixer_q("sset", self._scontrol, self._capability, "toggle", quiet=True)
+	def _actVolIncrease(self):
+		self.__amixer_q("sset", self._scontrol, self._capability, self._step+"+", "unmute", quiet=True)
+	def _actVolDecrease(self):
+		self.__amixer_q("sset", self._scontrol, self._capability, self._step+"-", "unmute", quiet=True)
+
+	def process(self):
+		btnMap = {
+			"3": self._actVolToggle,
+			"4": self._actVolIncrease,
+			"5": self._actVolDecrease,
+		}
+		btnMap.get(self._block_button, self._actNone)()
+		vols = []
+		for s in self.__volume():
+			m = re.match(r'.*\[(\d+%)\] (\[(-?\d+.\d+dB)\] )?\[(on|off)\]', s)
+			if m:
+				vols.append(m.group(1, 3, 4))
+		self._volume = vols
+		return self
+
+	def printout(self):
+		if len(self._volume)==0:
+			print("no snd")
+			exit(33)
+		v = self._volume[0]
+		chars = {
+			"mute": u"\uf026",
+			"low":  u"\uf027",
+			"high": u"\uf028",
+		}
+		if v[2] == 'off':
+			percent = '-M-'
+			char    = chars['mute']
+		else:
+			percent = v[0]
+			if int(v[0][:-1])>=50:
+				char = chars['high']
+			else:
+				char = chars['low']
+		print(char + "  " + percent)
+
+if __name__ == '__main__':
+	AMixer().process().printout()
