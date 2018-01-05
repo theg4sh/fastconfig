@@ -1,6 +1,7 @@
 import os
 import sys
 from importlib import import_module
+from .PackageGroup import *
 
 class ConfigModule:
 	def __init__(self, name, path, basepath):
@@ -9,23 +10,26 @@ class ConfigModule:
 		self._basepath = basepath
 		self._module = None
 
+		self._pkgs_required = PackageGroup()
 		self._linkfiles = {}
 		self._linkpaths = {}
 		self._appendToConfigs = []
 
 	def _getModule(self):
+		excp = None
 		if self._module is None:
 			try:
 				self._module = import_module(self._cfgpath.replace('/', '.'));
 			except Exception as e:
-				print("An error occured in config file: {0}\n  {1}\n  {2}".format(self._cfgpath,
-					e, self._cfgpath.replace('/', '.')))
-				self._module = False
+				excp = "An exception occured in config file: {0}\n  {1}\n  {2}".format(self._cfgpath,
+						e, self._cfgpath.replace('/', '.'))
 		if self._module:
-			defattrs = ['configure', 'install']
+			defattrs = ['configure', 'install', 'requires']
 			if not [attr for attr in defattrs if hasattr(self._module, attr)]:
-				raise Exception("Module {0} has no definition of any required functions: {1}. Exit".format(self._name,
-					", ".join(["'{}'".format(a) for a in anyattrs])))
+				excp = "Module {0} has no definition of any required functions: {1}. Exit".format(self._name,
+						", ".join(["'{}'".format(a) for a in anyattrs]))
+		if excp:
+			raise Exception(excp)
 		return self._module
 
 	def _makeLink(self, link, path):
@@ -49,6 +53,9 @@ class ConfigModule:
 	def addLinkPath(self, link, path):
 		self._linkpaths[os.path.expanduser(link)] = self._absConfigPath(path)
 
+	def addPackageDependency(self, *pkgs):
+		self._pkgs_required.add(*pkgs)
+
 	def appendToConfig(self, config, datafile):
 		"""
 		# DO NOT REMOVE appended from file {}
@@ -58,8 +65,6 @@ class ConfigModule:
 		self._appendToConfigs.append([config, self._absConfigPath(datafile)])
 
 	def configure(self):
-		if not self._getModule():
-			return False
 		if hasattr(self._getModule(), 'configure'):
 			try:
 				self._getModule().configure(self)
@@ -69,10 +74,22 @@ class ConfigModule:
 				return False
 		return True
 
+	def requires(self):
+		if hasattr(self._getModule(), 'requires'):
+			try:
+				self._getModule().requires(self)
+			except Exception as e:
+				print(e)
+				print("An error occured while getting required packages for {0}".format(self._name))
+				return None
+		return self._pkgs_required
+
 	def install(self):
 		if hasattr(self._getModule(), 'install'):
 			self._getModule().install(self)
 			return
+		if hasattr(self._getModule(), 'preinstall'):
+			self._getModule().preinstall(self)
 
 		for link,filename in self._linkfiles.items():
 			if os.path.exists(link):
@@ -105,5 +122,8 @@ class ConfigModule:
 			self._makeLink(link, filepath)
 
 		for config,datafile in self._appendToConfigs:
-			print("Appending is not implemented yet: {1} >> {0}".format(config, datafile))
+			print("Patching is not implemented yet: {1} >> {0}".format(config, datafile))
+
+		if hasattr(self._getModule(), 'postinstall'):
+			self._getModule().postinstall(self)
 

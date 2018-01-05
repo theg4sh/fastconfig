@@ -1,6 +1,8 @@
-import os
 
-def configure(self):
-	self.addLinkFile("~/.gitignore_global", "gitignore_global")
-	self.appendToConfig("~/.gitconfig", "gitconfig")
+def requires(cfg):
+	cfg.addPackageDependency("git")
+
+def configure(cfg):
+	cfg.addLinkFile("~/.gitignore_global", "gitignore_global")
+	cfg.appendToConfig("~/.gitconfig", "gitconfig")
 
