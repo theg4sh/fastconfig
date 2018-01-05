@@ -3,12 +3,12 @@ import sys
 from importlib import import_module
 
 class ConfigModule:
-	def __init__(self, name, path):
-		self._pkg  = os.path.split(path)
+	def __init__(self, name, path, basepath):
 		self._name = name
-		self._cfgpath = self._pkg[0]
-		self._basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+		self._cfgpath = path
+		self._basepath = basepath
 		self._module = None
+
 		self._linkfiles = {}
 		self._linkpaths = {}
 		self._appendToConfigs = []
@@ -18,16 +18,19 @@ class ConfigModule:
 			try:
 				self._module = import_module(self._cfgpath.replace('/', '.'));
 			except Exception as e:
-				print(e)
-				print("An error occured in config file: {0}".format(self._cfgpath))
+				print("An error occured in config file: {0}\n  {1}\n  {2}".format(self._cfgpath,
+					e, self._cfgpath.replace('/', '.')))
 				self._module = False
-		if not hasattr(self._module, 'configure') and not hasattr(self._module, 'install'):
-			raise Exception("Module {0} has no required definition of functions 'configure' and/or 'install'. Exit")
+		if self._module:
+			defattrs = ['configure', 'install']
+			if not [attr for attr in defattrs if hasattr(self._module, attr)]:
+				raise Exception("Module {0} has no definition of any required functions: {1}. Exit".format(self._name,
+					", ".join(["'{}'".format(a) for a in anyattrs])))
 		return self._module
 
 	def _makeLink(self, link, path):
 		try:
-			sys.stdout.write("Making link: {} -> {}".format(link, path))
+			sys.stdout.write("Making link: {} -> {} ".format(link, path))
 			os.symlink(path, link)
 			print("OK")
 		except Exception as e:
@@ -102,5 +105,5 @@ class ConfigModule:
 			self._makeLink(link, filepath)
 
 		for config,datafile in self._appendToConfigs:
-			print("Append to {}: {}".format(config, datafile))
+			print("Appending is not implemented yet: {1} >> {0}".format(config, datafile))
 
