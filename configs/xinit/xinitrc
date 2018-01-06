@@ -1,0 +1,4 @@
+
+pulseaudio --start -D
+st tmux &>/dev/null &
+exec i3
