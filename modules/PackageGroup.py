@@ -1,4 +1,5 @@
 from .Package import *
+from .PackageManager import *
 
 class PackageGroup:
 	def __init__(self):
@@ -30,9 +31,10 @@ class PackageGroup:
 	def install(self):
 		pkglist = list(self.notInstalled())
 		if not pkglist:
-			return
+			return True
 
 		print("Package installation is not implemented yet. Please, run manually:")
 		print()
-		print("  dnf install -y {}".format(" ".join([p.name() for p in plglist])))
+		print(PackageManager.getManager().formatInstall(pkglist))
 		print()
+		return False

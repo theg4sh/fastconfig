@@ -113,6 +113,7 @@ class Battery:
 
 	def printout(self):
 		short = "{0} {1}% {2}".format(self._label, self._percent, self._status)
+		full = ""
 		if self._remaining:
 			full = "{0} {1}".format(short, self._remaining)
 		sys.stdout.write("%s\n"%full)

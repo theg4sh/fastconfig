@@ -59,4 +59,4 @@ esac
 
 echo "$IPADDR" # full text
 echo "$IPADDR" # short text
-
+echo "" #

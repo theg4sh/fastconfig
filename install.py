@@ -47,7 +47,8 @@ def main():
 		packages = cfg.requires()
 		if packages is not None:
 			pkgagg.add(packages)
-	pkgagg.install()
+	if not pkgagg.install():
+		exit(0)
 
 	for cfg in configs:
 		cfg.configure()
