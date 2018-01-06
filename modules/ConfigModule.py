@@ -53,8 +53,8 @@ class ConfigModule:
 	def addLinkPath(self, link, path):
 		self._linkpaths[os.path.expanduser(link)] = self._absConfigPath(path)
 
-	def addPackageDependency(self, *pkgs):
-		self._pkgs_required.add(*pkgs)
+	def addPackageDependency(self, *pkgs, mgrtype=PackageManager.MANAGER_ANY):
+		self._pkgs_required.add(*pkgs, mgrtype=mgrtype)
 
 	def appendToConfig(self, config, datafile):
 		"""

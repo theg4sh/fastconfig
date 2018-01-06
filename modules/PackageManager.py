@@ -4,17 +4,24 @@ from importlib import import_module
 class PackageManager:
 	__MANAGER=None
 
-	MANAGER_DPKG=1
-	MANAGER_RPM=2
+	MANAGER_ANY  = 0
+	MANAGER_DPKG = 1
+	MANAGER_RPM  = 2
 	def __init__(self, mgrtype, manager):
 		self._mgrtype = mgrtype
 		self._manager = manager
 
+	def _checkMgrType(self, package):
+		return package._mgrtype in [PackageManager.MANAGER_ANY, self._mgrtype];
+
 	def checkInstalled(self, package):
-		return self._manager.checkInstalled(package)
+		if type(package).__name__ != 'Package' or self._checkMgrType(package):
+			return self._manager.checkInstalled(package)
+		else:
+			return True
 
 	def formatInstall(self, packages):
-		return self._manager.formatInstall(packages)
+		return self._manager.formatInstall([p for p in packages if self._checkMgrType(p)])
 
 	@classmethod
 	def getManager(cls):
