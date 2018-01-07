@@ -4,3 +4,6 @@
 [submodule "thirdparty/i3blocks"]
 	path = thirdparty/i3blocks
 	url = https://github.com/vivien/i3blocks.git
+[submodule "thirdparty/st"]
+	path = thirdparty/st
+	url = git://git.suckless.org/st
