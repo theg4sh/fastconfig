@@ -1,0 +1,13 @@
+" Load default onfiguration
+source /etc/vimrc
+if filereadable("/usr/share/vim/vim80/defaults.vim")
+	source /usr/share/vim/vim80/defaults.vim
+endif
+
+colorscheme desert
+"if &diff
+"endif
+
+" Tab switch
+nnoremap tj :tabnext<cr>
+nnoremap tk :tabprev<cr>
