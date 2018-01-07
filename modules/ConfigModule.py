@@ -6,8 +6,8 @@ from .PackageGroup import *
 class ConfigModule:
 	def __init__(self, name, path, basepath):
 		self._name = name
-		self._cfgpath = path
-		self._basepath = basepath
+		self._cfgpath = path.dir()
+		self._basepath = basepath.dir()
 		self._module = None
 
 		self._pkgs_required = PackageGroup()
@@ -53,8 +53,8 @@ class ConfigModule:
 	def addLinkPath(self, link, path):
 		self._linkpaths[os.path.expanduser(link)] = self._absConfigPath(path)
 
-	def addPackageDependency(self, *pkgs, mgrtype=PackageManager.MANAGER_ANY):
-		self._pkgs_required.add(*pkgs, mgrtype=mgrtype)
+	def addPackageDependency(self, *pkgs, **kwargs):
+		self._pkgs_required.add(*pkgs, **kwargs)
 
 	def appendToConfig(self, config, datafile):
 		"""

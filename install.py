@@ -3,43 +3,48 @@ import os
 import sys
 
 PROJECT = "fastconfig"
-usrconfig_dir = os.path.expanduser("~/.config")
 if os.path.dirname(__file__) == '':
+	sys.path.append('.')
 	install_dir = '.'
 else:
-	install_dir = os.path.join(usrconfig_dir, PROJECT)
-sys.path.append(install_dir)
+	install_dir = os.path.join(os.path.expanduser("~"), ".config", PROJECT)
+	sys.path.append(install_dir)
+	os.chdir(install_dir)
 
-from modules.ConfigModule import *
+from modules.Path import *
 from modules.PackageGroup import *
+from modules.ConfigModule import *
+
+install_dir = Path(install_dir)
 
 def detectInstalled():
-	relpath = os.path.dirname(__file__)
-	if relpath == '':
+	abspath, exname = os.path.split(__file__)
+	path = Path(abspath, name=exname)
+	if path.dir() == '':
 		return
-	abspath = os.path.dirname(os.path.abspath(__file__))
-	# FIXME: symlink ~/.config/fastconfig
-	if install_dir not in [abspath, relpath]:
+	# FIXME: ~/.config/fastconfig is symlink
+	if install_dir.absdir() not in [path.absdir(), path.dir()]:
 		print("Please, run manually:")
 		print(" cp -a {} {}".format(
-			abspath,
-			usrconfig_dir))
+			path.dir(),
+			Path.FASTCONFIG_PATH))
 		print("and rerun using {}/install.py".format(install_dir))
 		exit(1)
 
 def main():
 	detectInstalled()
-	os.chdir(install_dir)
+	install_dir.chdir()
 	reserved_names = [PROJECT, '__init__.py', '__init__.pyc']
-	configs_path = "configs"
-	cfglist = [c for c in os.listdir(os.path.join(install_dir, configs_path)) if c not in reserved_names]
-
+	configs_path = Path(install_dir, path="configs")
 	configs = []
-	for cfgname in cfglist:
+	for cfgname in os.listdir(configs_path.dir()):
+		if cfgname in reserved_names:
+			continue
 		if '.' in cfgname:
 			raise Exception("Dots is not allowed in config module's name: {}".format(cfgname))
-		cfgpath = os.path.join(configs_path, cfgname);
-		if os.path.exists(os.path.join(cfgpath, "__init__.py")):
+		#cfgpath = os.path.join(configs_path, cfgname);
+		cfgpath = Path(configs_path.reldir(), cfgname, name="__init__.py")
+		if cfgpath.exists():
 			configs.append(ConfigModule(cfgname, cfgpath, install_dir))
 
 	pkgagg = PackageGroup()

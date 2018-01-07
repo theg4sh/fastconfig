@@ -1,6 +1,6 @@
-[submodule "thirdpatry/powerline-fonts"]
-	path = thirdpatry/powerline-fonts
+[submodule "thirdparty/powerline-fonts"]
+	path = thirdparty/powerline-fonts
 	url = https://github.com/powerline/fonts.git
-[submodule "thirdpatry/i3blocks"]
-	path = thirdpatry/i3blocks
+[submodule "thirdparty/i3blocks"]
+	path = thirdparty/i3blocks
 	url = https://github.com/vivien/i3blocks.git

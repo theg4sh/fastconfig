@@ -5,7 +5,7 @@ def formatInstall(packages):
 
 def checkInstalled(package):
         try:
-            out = sp.check_output(['/usr/bin/env', 'LANG=en', '/usr/bin/rpm', '-q', package])
+            out = sp.check_output(['/usr/bin/env', 'LANG=en', '/usr/bin/rpm', '-q', package.name()])
             return True
         except Exception as e:
             return False

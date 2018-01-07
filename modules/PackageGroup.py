@@ -6,7 +6,8 @@ class PackageGroup:
 		self._packages = {}
 		self._installed = {}
 
-	def add(self, *pkgs, mgrtype=PackageManager.MANAGER_ANY):
+	def add(self, *pkgs, **kwargs):
+		mgrtype=kwargs.get('mgrtype', PackageManager.MANAGER_ANY)
 		for p in pkgs:
 			if type(p) == str:
 				self._packages[p] = Package(p, mgrtype=mgrtype)
