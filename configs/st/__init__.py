@@ -10,6 +10,7 @@ def requires(cfg):
 
 def configure(cfg):
 	cfg.addLinkFile(PathThirdparty("st", name="config.h").abspath(), "config.h");
+	cfg.addLinkFile(PathThirdparty("st", name=".gitignore").abspath(), "gitignore");
 
 def postinstall(cfg):
 	make = "make -C {}".format(PathThirdparty("st").absdir())
