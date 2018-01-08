@@ -15,6 +15,7 @@ def configure(cfg):
 def postinstall(cfg):
 	make = "make -C {}".format(PathThirdparty("st").absdir())
 	sys.stdout.write(make)
+	sys.stdout.flush()
 	sp.check_output(make, shell=True)
 	print(" Done")
 	print("root permission required for:")
