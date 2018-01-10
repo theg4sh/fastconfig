@@ -1,5 +1,7 @@
 " Load default onfiguration
-source /etc/vimrc
+if filereadable("/etc/vimrc")
+	source /etc/vimrc
+endif
 if filereadable("/usr/share/vim/vim80/defaults.vim")
 	source /usr/share/vim/vim80/defaults.vim
 endif
