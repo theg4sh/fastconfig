@@ -10,7 +10,7 @@ python ~/.config/fastconfig/install.py
 ```
 ### Config's callbacks
 
-All callbacks should be declared in `configs/<config_name>/\_\_init\_\_.py`
+All callbacks should be declared in `configs/<config_name>/__init__.py`
 
 - configure(cfg)
 

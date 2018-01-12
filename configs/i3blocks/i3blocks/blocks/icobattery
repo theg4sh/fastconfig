@@ -100,7 +100,10 @@ class Battery:
 					self.__alarmOnce(Battery.ALARM_LOCK_PANIC)
 				elif self._percent < 10.0:
 					self.__alarmOnce()
-				self._status = ''
+				if self._remaining:
+					self._status = ''
+				else:
+					self._status = '';
 		else:
 			self._label = 'B'
 			self._percent = '?%'
@@ -116,6 +119,8 @@ class Battery:
 		full = ""
 		if self._remaining:
 			full = "{0} {1}".format(short, self._remaining)
+		else:
+			full = short
 		sys.stdout.write("%s\n"%full)
 		sys.stdout.write("%s\n"%short)
 		sys.stdout.write("%s\n"%self._color)

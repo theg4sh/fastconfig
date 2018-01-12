@@ -1,7 +1,9 @@
 import os
 import sys
 from importlib import import_module
-from .PackageGroup import *
+
+from modules.PackageGroup import *
+from modules.DumpException import dump_exception_tree
 
 class ConfigModule:
 	def __init__(self, name, path, basepath):
@@ -38,8 +40,11 @@ class ConfigModule:
 			os.symlink(path, link)
 			print("OK")
 		except Exception as e:
+			print("FAILED")
 			print(e)
-			print("Failed")
+
+	def getConfigName(self):
+		return self._name;
 
 	def _absConfigPath(self, path):
 		filepath = os.path.join(self._basepath, self._cfgpath, path)
@@ -48,10 +53,10 @@ class ConfigModule:
 		return filepath
 
 	def addLinkFile(self, link, config):
-		self._linkfiles[os.path.expanduser(link)] = self._absConfigPath(config)
+		self._linkfiles[os.path.expanduser(str(link))] = self._absConfigPath(str(config))
 
 	def addLinkPath(self, link, path):
-		self._linkpaths[os.path.expanduser(link)] = self._absConfigPath(path)
+		self._linkpaths[os.path.expanduser(str(link))] = self._absConfigPath(str(path))
 
 	def addPackageDependency(self, *pkgs, **kwargs):
 		self._pkgs_required.add(*pkgs, **kwargs)
@@ -69,7 +74,7 @@ class ConfigModule:
 			try:
 				self._getModule().configure(self)
 			except Exception as e:
-				print(e)
+				dump_traceback_tree(e)
 				print("An error occured while executing configuration for {0}".format(self._name))
 				return False
 		return True
@@ -79,7 +84,7 @@ class ConfigModule:
 			try:
 				self._getModule().requires(self)
 			except Exception as e:
-				print(e)
+				dump_trackeback_tree(e)
 				print("An error occured while getting required packages for {0}".format(self._name))
 				return None
 		return self._pkgs_required
@@ -127,3 +132,4 @@ class ConfigModule:
 		if hasattr(self._getModule(), 'postinstall'):
 			self._getModule().postinstall(self)
 
+# vim: ts=4 sw=4 noet

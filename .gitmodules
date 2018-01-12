@@ -7,3 +7,6 @@
 [submodule "thirdparty/st"]
 	path = thirdparty/st
 	url = git://git.suckless.org/st
+[submodule "thirdparty/vim-go"]
+	path = thirdparty/vim-go
+	url = https://github.com/fatih/vim-go

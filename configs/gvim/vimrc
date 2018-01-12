@@ -1,13 +1,20 @@
 " Load default onfiguration
-source /etc/vimrc
+if filereadable("/etc/vimrc")
+	source /etc/vimrc
+endif
 if filereadable("/usr/share/vim/vim80/defaults.vim")
 	source /usr/share/vim/vim80/defaults.vim
 endif
 
+" Default configurations
 colorscheme desert
-"if &diff
-"endif
 
 " Tab switch
 nnoremap tj :tabnext<cr>
 nnoremap tk :tabprev<cr>
+
+autocmd FileType * set tabstop=4|set shiftwidth=4|set expandtab
+autocmd BufEnter *.launch set tabstop=2|set shiftwidth=2|set expandtab
+
+" Enable embed vim settings
+set modeline
