@@ -10,3 +10,6 @@
 [submodule "thirdparty/vim-go"]
 	path = thirdparty/vim-go
 	url = https://github.com/fatih/vim-go
+[submodule "thirdparty/vim-python-syntax"]
+	path = thirdparty/vim-python-syntax
+	url = https://github.com/vim-python/python-syntax
