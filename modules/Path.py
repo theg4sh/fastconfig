@@ -46,3 +46,4 @@ class Path:
     def exists(self):
         return os.path.exists(str(self))
 
+# vim: ts=4 sw=4 et
