@@ -6,6 +6,8 @@ if filereadable("/usr/share/vim/vim80/defaults.vim")
 	source /usr/share/vim/vim80/defaults.vim
 endif
 
+set encoding=utf-8
+
 " Default configurations
 colorscheme desert
 
