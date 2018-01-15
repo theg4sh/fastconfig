@@ -32,8 +32,8 @@ QUALITY=$(grep $INTERFACE /proc/net/wireless | awk '{ print int($3 * 100 / 70) }
 #------------------------------------------------------------------------
 
 OFFSET="$(echo -e "\u00B7\u00B7\u00B7")"
-echo -e "${OFFSET:${#QUALITY}}"$QUALITY% # full text
-echo -e "${OFFSET:${#QUALITY}}"$QUALITY% # short text
+echo -e "\uf012${OFFSET:${#QUALITY}}"$QUALITY% # full text
+echo -e "\uf012${OFFSET:${#QUALITY}}"$QUALITY% # short text
 
 # color
 if [[ $QUALITY -ge 80 ]]; then
