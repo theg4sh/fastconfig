@@ -14,8 +14,14 @@ colorscheme desert
 " Tab switch
 nnoremap tj :tabnext<cr>
 nnoremap tk :tabprev<cr>
+nnoremap tJ :tabmove +1<cr>
+nnoremap tK :tabmove -1<cr>
 
 "autocmd FileType * set tabstop=4|set shiftwidth=4|set expandtab
 
 " Enable embed vim settings
 set modeline
+
+filetype on
+filetype plugin on
+filetype plugin indent on
