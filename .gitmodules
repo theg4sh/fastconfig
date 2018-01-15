@@ -13,3 +13,6 @@
 [submodule "thirdparty/vim-python-syntax"]
 	path = thirdparty/vim-python-syntax
 	url = https://github.com/vim-python/python-syntax
+[submodule "thirdparty/fontawesome"]
+	path = thirdparty/fontawesome
+	url = https://github.com/FortAwesome/Font-Awesome.git
