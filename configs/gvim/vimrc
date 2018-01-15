@@ -15,8 +15,7 @@ colorscheme desert
 nnoremap tj :tabnext<cr>
 nnoremap tk :tabprev<cr>
 
-autocmd FileType * set tabstop=4|set shiftwidth=4|set expandtab
-autocmd BufEnter *.launch set tabstop=2|set shiftwidth=2|set expandtab
+"autocmd FileType * set tabstop=4|set shiftwidth=4|set expandtab
 
 " Enable embed vim settings
 set modeline
