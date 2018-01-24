@@ -16,3 +16,6 @@
 [submodule "thirdparty/fontawesome"]
 	path = thirdparty/fontawesome
 	url = https://github.com/FortAwesome/Font-Awesome.git
+[submodule "thirdparty/YouCompleteMe"]
+	path = thirdparty/YouCompleteMe
+	url = https://github.com/Valloric/YouCompleteMe
