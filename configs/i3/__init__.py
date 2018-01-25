@@ -6,8 +6,8 @@ def requires(cfg):
     cfg.addPackageDependency("xserver-xorg", "i3",
             "pulseaudio-utils", mgrtype=PackageManager.MANAGER_DPKG)
 
-    def configure(cfg):
-        cfg.addLinkPath("~/.config/i3", "i3")
+def configure(cfg):
+	cfg.addLinkPath("~/.config/i3", "i3")
 
 
 def postinstall(cfg):
