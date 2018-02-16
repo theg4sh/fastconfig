@@ -25,3 +25,7 @@ set modeline
 filetype on
 filetype plugin on
 filetype plugin indent on
+
+" Highlight end of lines with 80+ characters
+highlight OverLength ctermbg=red ctermfg=white guibg=#592929
+match OverLength /\%101v.\+/
