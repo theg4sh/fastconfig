@@ -74,7 +74,7 @@ class ConfigModule:
 			try:
 				self._getModule().configure(self)
 			except Exception as e:
-				dump_traceback_tree(e)
+				dump_exception_tree(e)
 				print("An error occured while executing configuration for {0}".format(self._name))
 				return False
 		return True
