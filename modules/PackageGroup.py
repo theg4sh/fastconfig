@@ -8,6 +8,8 @@ class PackageGroup:
 
     def add(self, *pkgs, **kwargs):
         mgrtype=kwargs.get('mgrtype', PackageManager.MANAGER_ANY)
+        if not PackageManager.getManager().checkMgrType(mgrtype):
+            return
         for p in pkgs:
             if type(p) == str:
                 self._packages[p] = Package(p, mgrtype=mgrtype)
