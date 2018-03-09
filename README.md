@@ -6,7 +6,9 @@ Configurator for freshly installed linux
 
 ```
 git clone https://github.com/theg4sh/fastconfig.git ~/.config/fastconfig
-python ~/.config/fastconfig/install.py
+cd ~/.config/fastconfig
+git submodule init
+./install.py
 ```
 ### Config's callbacks
 
