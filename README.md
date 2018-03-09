@@ -8,6 +8,7 @@ Configurator for freshly installed linux
 git clone https://github.com/theg4sh/fastconfig.git ~/.config/fastconfig
 cd ~/.config/fastconfig
 git submodule init
+git submodule update --recursive
 ./install.py
 ```
 ### Config's callbacks
