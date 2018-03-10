@@ -28,21 +28,31 @@ class Battery:
 		self._notify  = False
 		self._errno   = 0
 		self._label   = None
+		self._nobattery = False
 
 	def __acpiPercent(self):
 		bat_number = os.environ.get('BLOCK_INSTANCE')
 		bat_number = int(bat_number) if bat_number else 0
 
-		ctx = sp.check_output(["acpi", "-b"])
-		ctx = ctx.decode("utf-8").split('\n')
-		for s in ctx:
-			m = re.match(r'^Battery ([0-9]+): (\w+), (\d+)%(, (\d+:\d+):)?', s)
-			if m:
-				if int(m.group(1)) != bat_number:
-					continue
-				self._percent = int(m.group(3))
-				self._status  = m.group(2)
-				self._remaining = m.group(5)
+		with open("/dev/null", "wb") as devnull:
+			ctx = sp.check_output(["acpi", "-b"], stderr=devnull)
+		if ctx.strip() == "":
+			self._nobattery = True
+		else:
+			ctx = ctx.decode("utf-8").split('\n')
+			for s in ctx:
+				m = re.match(r'^Battery ([0-9]+): (\w+), (\d+)%(, (\d+:\d+):)?', s)
+				if m:
+					if int(m.group(1)) != bat_number:
+						continue
+					self._percent = int(m.group(3))
+					self._status  = m.group(2)
+					self._remaining = m.group(5)
+					self._nobattery = False
+					return True
+				else:
+					self._nobattery = True
+		return False
 
 	def __alarmOnce(self, lockfile=None):
 		if lockfile is None:
@@ -80,7 +90,8 @@ class Battery:
 		return "#%.2X%.2X%.2X" % ( RGB[0], RGB[1], RGB[2] )
 
 	def process(self):
-		self.__acpiPercent()
+		if not self.__acpiPercent():
+			return
 		if (self._percent is not None):
 			self._color = self.__hashcolor(self._percent)
 			percents = { 20:'', 40:'', 60:'', 80:'' }
@@ -115,6 +126,8 @@ class Battery:
 		return self
 
 	def printout(self):
+		if self._nobattery:
+		    return
 		short = "{0} {1}% {2}".format(self._label, self._percent, self._status)
 		full = ""
 		if self._remaining:
@@ -142,3 +155,4 @@ if __name__ == '__main__':
 		exit(0)
 	Battery().process().printout()
 
+# vim: ts=4 sw=4 noet
