@@ -91,7 +91,7 @@ class Battery:
 
 	def process(self):
 		if not self.__acpiPercent():
-			return
+			return self
 		if (self._percent is not None):
 			self._color = self.__hashcolor(self._percent)
 			percents = { 20:'', 40:'', 60:'', 80:'' }
