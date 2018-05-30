@@ -19,3 +19,6 @@
 [submodule "thirdparty/YouCompleteMe"]
 	path = thirdparty/YouCompleteMe
 	url = https://github.com/Valloric/YouCompleteMe
+[submodule "thirdparty/typescript-vim"]
+	path = thirdparty/typescript-vim
+	url = https://github.com/leafgarland/typescript-vim.git
