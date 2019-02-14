@@ -22,3 +22,9 @@
 [submodule "thirdparty/typescript-vim"]
 	path = thirdparty/typescript-vim
 	url = https://github.com/leafgarland/typescript-vim.git
+[submodule "thirdparty/gruvbox"]
+	path = thirdparty/gruvbox
+	url = https://github.com/morhetz/gruvbox.git
+[submodule "thirdparty/Vundle.vim"]
+	path = thirdparty/Vundle.vim
+	url = https://github.com/VundleVim/Vundle.vim.git
