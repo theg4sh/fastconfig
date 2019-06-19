@@ -4,3 +4,11 @@
 *.patch
 
 *.disabled
+
+*.ex
+
+*.rviz
+
+*-lock.json
+
+tags

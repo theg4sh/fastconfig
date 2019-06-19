@@ -52,13 +52,13 @@ separator=false
 
 [ssid]
 command=~/.config/i3blocks/blocks/ssid
-interval=10
+interval=5
 separator=false
 
 [wifi]
 command=~/.config/i3blocks/blocks/wifi
 instance=wlo1
-interval=10
+interval=5
 separator=false
 
 [bandwidth]
@@ -114,7 +114,7 @@ interval=10
 command=~/.config/i3blocks/blocks/icovolume
 instance=Master
 #instance=PCM
-interval=2
+interval=1
 signal=10
 
 # Date Time

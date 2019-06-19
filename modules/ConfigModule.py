@@ -5,6 +5,17 @@ from importlib import import_module
 from modules.PackageGroup import *
 from modules.DumpException import dump_exception_tree
 
+class BColors:
+	# https://svn.blender.org/svnroot/bf-blender/trunk/blender/build_files/scons/tools/bcolors.py
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 class ConfigModule:
 	def __init__(self, name, path, basepath):
 		self._name = name
@@ -38,10 +49,10 @@ class ConfigModule:
 		try:
 			sys.stdout.write("Making link: {} -> {} ".format(link, path))
 			os.symlink(path, link)
-			print("OK")
+			print(BColors.OKBLUE + "OK" + BColors.ENDC)
 		except Exception as e:
-			print("FAILED")
-			print(e)
+			print(BColors.FAIL + "FAILED" + BColors.ENDC)
+			print(BColors.WARNING + str(e) + BColors.ENDC)
 
 	def getConfigName(self):
 		return self._name;
@@ -75,7 +86,8 @@ class ConfigModule:
 				self._getModule().configure(self)
 			except Exception as e:
 				dump_exception_tree(e)
-				print("An error occured while executing configuration for {0}".format(self._name))
+				print(BColors.FAIL + "An error occured while executing configuration for {0}".format(
+					self._name) + BColors.ENDC)
 				return False
 		return True
 
@@ -85,7 +97,8 @@ class ConfigModule:
 				self._getModule().requires(self)
 			except Exception as e:
 				dump_trackeback_tree(e)
-				print("An error occured while getting required packages for {0}".format(self._name))
+				print(BColors.FAIL + "An error occured while getting required packages for {0}".format(
+					self._name) + BColors.ENDC)
 				return None
 		return self._pkgs_required
 
@@ -103,10 +116,12 @@ class ConfigModule:
 						print("Removed symlink {} -> {}".format(link, filename))
 					os.unlink(link)
 				elif os.path.isfile(link):
-					print("File is exists {0}. To override that, please, run: rm -f '{0}'".format(link))
+					print(BColors.WARNING + "File is exists {0}. To override that, please, " + 
+							"run: rm -f '{0}'".format(link) + BColors.ENDC)
 					continue
 				elif os.path.isdir(link):
-					print("Expected to make file symlink, but it's a directory located by path {}".format(link))
+					print(BColors.FAIL + "Expected to make file symlink, but it's a directory " +
+							"located by path {}".format(link) + BColors.ENDC)
 					continue
 			sys.stdout.write("File: ")
 			self._makeLink(link, filename)
@@ -118,16 +133,19 @@ class ConfigModule:
 						print("Removed symlink {} -> {}".format(link, filepath))
 					os.unlink(link)
 				elif os.path.isfile(link):
-					print("Expected to make path symlink, but it's a file located by path {}".format(link))
+					print(BColors.FAIL + "Expected to make path symlink, but it's a file " +
+							"located by path {}".format(link) + BColors.ENDC)
 					continue
 				elif os.path.isdir(link):
-					print("Path is exists {0}. To override that, please, run: rm -rf '{0}'".format(link))
+					print(BColors.WARNING + "Path is exists {0}. To override that, please, " +
+							"run: rm -rf '{0}'".format(link) + BColors.ENDC)
 					continue
 			sys.stdout.write("Directory: ")
 			self._makeLink(link, filepath)
 
 		for config,datafile in self._appendToConfigs:
-			print("Patching is not implemented yet: {1} >> {0}".format(config, datafile))
+			print(BColors.WARNING + "Patching is not implemented yet: " + BColors.ENDC + 
+					"{1} >> {0}".format(config, datafile))
 
 		if hasattr(self._getModule(), 'postinstall'):
 			self._getModule().postinstall(self)

@@ -36,12 +36,15 @@ font pango:Terminess Powerline,PowerlineSymbols,Terminus 10
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
+floating_minimum_size 50 x 30
+floating_maximum_size -1 x -1
 
 # Locker run
-bindsym $mod+Ctrl+l exec "i3lock -c 000000"
+bindsym $mod+Ctrl+l exec "i3lock --dpms --show-failed-attempts --color 000000"
 
 # start a terminal
 bindsym $mod+Return exec "st -c tmux tmux"
+bindsym $mod+Shift+F12 exec "kill-highload-cpu-proc"
 
 # kill focused window
 bindsym $mod+Shift+c kill
@@ -181,6 +184,14 @@ bindsym XF86AudioPrev exec playerctl previous
 
 bindsym $mod+Shift+f exec "i3-msg floating enable; i3-msg resize shrink width 10800px; i3-msg resize grow width 800px; i3-msg resize shrink height 10600px; i3-msg resize grow height 800px"
 
+# Minimaze workrave main window and hide it
+for_window [class="^(?i)workrave$"] floating enable, border pixel 1
+for_window [class="^(?i)workrave$"] resize shrink width 10800px, resize shrink height 10600px
+# window size is relative and grow from floating_minimum_size
+for_window [class="^(?i)workrave$"] resize grow width 40px, resize grow height 0px
+# move position moves window only if width and height fits into screen resolution
+for_window [class="^(?i)workrave$"] move position 1919 px 1060 px
+
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
@@ -190,6 +201,7 @@ bar {
 	status_command i3blocks
 	#position top
 	tray_output primary
+	tray_padding 0
 	colors {
 		#separator "#34495e"
 		separator "#2c3e50"

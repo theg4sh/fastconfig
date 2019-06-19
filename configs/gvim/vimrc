@@ -1,31 +1,136 @@
+let g:ycm_global_ycm_extra_conf = "~/.vim/.ycm_extra_conf.py"
+
+set nocompatible              " be iMproved, required
+filetype off                  " required
+
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+" alternatively, pass a path where Vundle should install plugins
+"call vundle#begin('~/some/path/here')
+
+" let Vundle manage Vundle, required
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'flazz/vim-colorschemes'
+Plugin 'Valloric/YouCompleteMe'
+Plugin 'scrooloose/nerdcommenter'
+Plugin 'chase/vim-ansible-yaml'
+
+" The following are examples of different formats supported.
+" Keep Plugin commands between vundle#begin/end.
+" plugin on GitHub repo
+"Plugin 'tpope/vim-fugitive'
+Plugin 'jreybert/vimagit'
+" plugin from http://vim-scripts.org/vim/scripts.html
+" Plugin 'L9'
+" Git plugin not hosted on GitHub
+"Plugin 'git://git.wincent.com/command-t.git'
+" git repos on your local machine (i.e. when working on your own plugin)
+"Plugin 'file:///home/gmarik/path/to/plugin'
+" The sparkup vim script is in a subdirectory of this repo called vim.
+" Pass the path to set the runtimepath properly.
+"Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
+" Install L9 and avoid a Naming conflict if you've already installed a
+" different version somewhere else.
+" Plugin 'ascenator/L9', {'name': 'newL9'}
+
+Plugin 'google/vim-maktaba'
+Plugin 'google/vim-codefmt'
+Plugin 'google/vim-glaive'
+Plugin 'lepture/vim-jinja'
+
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+filetype plugin indent on    " required
+" To ignore plugin indent changes, instead use:
+"filetype plugin on
+"
+" Brief help
+" :PluginList       - lists configured plugins
+" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
+" :PluginSearch foo - searches for foo; append `!` to refresh local cache
+" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+"
+" see :h vundle for more details or wiki for FAQ
+" Put your non-Plugin stuff after this line
+
+augroup autoformat_settings
+  autocmd FileType bzl AutoFormatBuffer buildifier
+  autocmd FileType c,cpp,proto,javascript AutoFormatBuffer clang-format
+  autocmd FileType dart AutoFormatBuffer dartfmt
+  autocmd FileType go AutoFormatBuffer gofmt
+  autocmd FileType gn AutoFormatBuffer gn
+  autocmd FileType html,css,json AutoFormatBuffer js-beautify
+  autocmd FileType java AutoFormatBuffer google-java-format
+  "autocmd FileType python AutoFormatBuffer yapf
+  " Alternative: autocmd FileType python AutoFormatBuffer autopep8
+augroup END
+
+au BufNewFile,BufRead *.j2,*.jinja2 set ft=jinja
+
+syntax on
+"filetype on
+"filetype plugin on
+"filetype plugin indent on
+
 " Load default onfiguration
-if filereadable("/etc/vimrc")
-	source /etc/vimrc
-endif
-if filereadable("/usr/share/vim/vim80/defaults.vim")
-	source /usr/share/vim/vim80/defaults.vim
-endif
+"if filereadable("/etc/vimrc")
+"	source /etc/vimrc
+"endif
+"if filereadable("/usr/share/vim/vim80/defaults.vim")
+"	source /usr/share/vim/vim80/defaults.vim
+"endif
 
 set encoding=utf-8
 
+" Bad
+"colorscheme monokai-chris
+"colorscheme desert
 " Default configurations
-colorscheme desert
+colorscheme molokai
+if has('gui_running')
+	colorscheme gruvbox
+	set guifont=Terminus\ Regular\ 10
+endif
+"colorscheme morning
 
 " Tab switch
 nnoremap tj :tabnext<cr>
 nnoremap tk :tabprev<cr>
 nnoremap tJ :tabmove +1<cr>
 nnoremap tK :tabmove -1<cr>
+nnoremap teJ :tabmove +100<cr>
+nnoremap teK :tabmove -100<cr>
 
 "autocmd FileType * set tabstop=4|set shiftwidth=4|set expandtab
 
 " Enable embed vim settings
 set modeline
 
-filetype on
-filetype plugin on
-filetype plugin indent on
 
 " Highlight end of lines with 80+ characters
-highlight OverLength ctermbg=red ctermfg=white guibg=#592929
-match OverLength /\%118v.\+/
+"highlight OverLength ctermbg=red ctermfg=white guibg=#592929
+"match OverLength /\%110v.\+/
+set colorcolumn=110
+" But it mostly readable with a changed background color
+highlight ColorColumn ctermbg=gray
+
+
+" Allow to include external rc files in current 
+set exrc
+" ... and due to that, let it be a secure inclusion
+set secure
+
+setlocal spell spelllang=ru,en_us
+
+" Set maximum of opening tabs
+set tabpagemax=100
+
+" Finding files
+" Search down into subfolders; provides tab comletion for all file-related
+" tasks
+set path+=**
+
+" Display all matching files when we tab complete
+set wildmenu
