@@ -6,6 +6,6 @@ st tmux &>/dev/null &
 echo | awk -v dwcm=340 -v dhcm=190 -v dwres=1920 -v dhres=1080 '{dis_size = sqrt(dwcm*dwcm + dhcm*dhcm); dis_size = dis_size/10/2.54; dis_reso=sqrt(dwres*dwres + dhres*dhres); printf("Xft.dpi: %.0f\n", dis_reso/dis_size/1.4);}' | xrdb -merge
 
 # Don't forget to make a rest
-[ -n "$(which workrave)" ] && workrave &>/dev/null &
+#[ -n "$(which workrave)" ] && workrave &>/dev/null &
 
 exec i3
