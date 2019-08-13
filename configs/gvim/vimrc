@@ -3,6 +3,10 @@ let g:ycm_global_ycm_extra_conf = "~/.vim/.ycm_extra_conf.py"
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
+let g:VimTodoListsDatesEnabled=1
+let g:VimTodoListsDoneMoveDown=0
+let g:VimTodoListsKeepSameIndent=1
+
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -38,6 +42,9 @@ Plugin 'google/vim-maktaba'
 Plugin 'google/vim-codefmt'
 Plugin 'google/vim-glaive'
 Plugin 'lepture/vim-jinja'
+"Plugin 'SidOfc/mkdx'
+"Plugin 'aserebryakov/vim-todo-lists'
+Plugin 'theg4sh/vim-todo-lists', {'revision': 'dirty'}
 
 
 " All of your Plugins must be added before the following line
@@ -102,6 +109,14 @@ nnoremap tJ :tabmove +1<cr>
 nnoremap tK :tabmove -1<cr>
 nnoremap teJ :tabmove +100<cr>
 nnoremap teK :tabmove -100<cr>
+
+" Line movement
+nnoremap <A-j> :m .+1<CR>==
+nnoremap <A-k> :m .-2<CR>==
+inoremap <A-j> <ESC>:m .+1<CR>==gi
+inoremap <A-k> <ESC>:m .-2<CR>==gi
+vnoremap <A-j> :m '>+1<CR>gv==gv
+vnoremap <A-k> :m '<-2<CR>gv==gv
 
 "autocmd FileType * set tabstop=4|set shiftwidth=4|set expandtab
 
